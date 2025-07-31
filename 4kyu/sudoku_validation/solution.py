@@ -4,8 +4,8 @@ import math
 class Sudoku(object):
     def __init__(self, data):
         self.data = data
-        self.N = math.sqrt(len(data[0]))
-        self.block_N = int(len(data[0]) / self.N)
+        self.N = len(data)
+        self.block_N = int(math.sqrt(self.N))
 
     def validade_row(self, row):
         size = len(row)
@@ -17,7 +17,11 @@ class Sudoku(object):
         return True
 
     def is_valid(self):
-        if self.N % 2 > 0:
+        valid_input = (
+            isinstance(self.data, list) and
+            all(isinstance(row, list) and all(type(item) == int for item in row) for row in self.data)
+        )
+        if float(self.N) != int(self.N) or not valid_input:
             return False
 
         # Validate row
@@ -32,20 +36,13 @@ class Sudoku(object):
                 return False
 
         # Validate block
-        for row_index, row in enumerate(self.data):
-            for element in row:
-                x = row.index(element) // self.block_N
-                y = row_index // self.block_N
+        for i in range(self.block_N):
+            for j in range(self.block_N):
+                block = []
+                for x in range(i * self.block_N, (i + 1) * self.block_N):
+                    for y in range(j * self.block_N, (j + 1) * self.block_N):
+                        block.append(self.data[x][y])
+                if not self.validade_row(block):
+                    return False
 
         return True
-
-
-if __name__ == '__main__':
-    badSudoku2 = Sudoku([
-        [1, 4, 2, 3],
-        [3, 2, 4, 1],
-        [4, 1, 3, 2],
-        [2, 3, 1, 4]
-    ])
-
-    print(badSudoku2.is_valid())
